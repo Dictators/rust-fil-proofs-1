@@ -1,8 +1,5 @@
-use bellperson::{
-    bls::{Bls12, Fr},
-    gadgets::num::AllocatedNum,
-    Circuit, ConstraintSystem, SynthesisError,
-};
+use bellperson::{gadgets::num::AllocatedNum, Circuit, ConstraintSystem, SynthesisError};
+use blstrs::Scalar as Fr;
 use ff::Field;
 use filecoin_hashers::{HashFunction, Hasher};
 use rayon::prelude::{ParallelIterator, ParallelSlice};
@@ -114,8 +111,8 @@ impl<Tree: 'static + MerkleTreeTrait> Sector<Tree> {
     }
 }
 
-impl<Tree: 'static + MerkleTreeTrait> Circuit<Bls12> for &Sector<Tree> {
-    fn synthesize<CS: ConstraintSystem<Bls12>>(self, cs: &mut CS) -> Result<(), SynthesisError> {
+impl<Tree: 'static + MerkleTreeTrait> Circuit<Fr> for &Sector<Tree> {
+    fn synthesize<CS: ConstraintSystem<Fr>>(self, cs: &mut CS) -> Result<(), SynthesisError> {
         let Sector {
             comm_r,
             comm_c,
@@ -187,8 +184,8 @@ impl<Tree: MerkleTreeTrait> CircuitComponent for FallbackPoStCircuit<Tree> {
     type ComponentPrivateInputs = ComponentPrivateInputs;
 }
 
-impl<Tree: 'static + MerkleTreeTrait> Circuit<Bls12> for FallbackPoStCircuit<Tree> {
-    fn synthesize<CS: ConstraintSystem<Bls12>>(self, cs: &mut CS) -> Result<(), SynthesisError> {
+impl<Tree: 'static + MerkleTreeTrait> Circuit<Fr> for FallbackPoStCircuit<Tree> {
+    fn synthesize<CS: ConstraintSystem<Fr>>(self, cs: &mut CS) -> Result<(), SynthesisError> {
         if CS::is_extensible() {
             return self.synthesize_extendable(cs);
         }
@@ -198,7 +195,7 @@ impl<Tree: 'static + MerkleTreeTrait> Circuit<Bls12> for FallbackPoStCircuit<Tre
 }
 
 impl<Tree: 'static + MerkleTreeTrait> FallbackPoStCircuit<Tree> {
-    fn synthesize_default<CS: ConstraintSystem<Bls12>>(
+    fn synthesize_default<CS: ConstraintSystem<Fr>>(
         self,
         cs: &mut CS,
     ) -> Result<(), SynthesisError> {
@@ -211,7 +208,7 @@ impl<Tree: 'static + MerkleTreeTrait> FallbackPoStCircuit<Tree> {
         Ok(())
     }
 
-    fn synthesize_extendable<CS: ConstraintSystem<Bls12>>(
+    fn synthesize_extendable<CS: ConstraintSystem<Fr>>(
         self,
         cs: &mut CS,
     ) -> Result<(), SynthesisError> {

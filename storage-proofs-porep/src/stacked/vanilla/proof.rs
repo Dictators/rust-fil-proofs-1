@@ -416,7 +416,7 @@ impl<'a, Tree: 'static + MerkleTreeTrait, G: 'static + Hasher> StackedDrg<'a, Tr
         Ok(tree)
     }
 
-    #[cfg(any(feature = "gpu"))]
+    #[cfg(any(feature = "cuda", feature = "opencl"))]
     fn generate_tree_c<ColumnArity, TreeArity>(
         layers: usize,
         nodes_count: usize,
@@ -447,7 +447,7 @@ impl<'a, Tree: 'static + MerkleTreeTrait, G: 'static + Hasher> StackedDrg<'a, Tr
         }
     }
 
-    #[cfg(not(any(feature = "gpu")))]
+    #[cfg(not(any(feature = "cuda", feature = "opencl")))]
     fn generate_tree_c<ColumnArity, TreeArity>(
         layers: usize,
         nodes_count: usize,
@@ -469,7 +469,7 @@ impl<'a, Tree: 'static + MerkleTreeTrait, G: 'static + Hasher> StackedDrg<'a, Tr
     }
 
     #[allow(clippy::needless_range_loop)]
-    #[cfg(any(feature = "gpu"))]
+    #[cfg(any(feature = "cuda", feature = "opencl"))]
     fn generate_tree_c_gpu<ColumnArity, TreeArity>(
         layers: usize,
         nodes_count: usize,
@@ -485,7 +485,7 @@ impl<'a, Tree: 'static + MerkleTreeTrait, G: 'static + Hasher> StackedDrg<'a, Tr
         use std::sync::mpsc::sync_channel as channel;
         use std::sync::{Arc, RwLock};
 
-        use bellperson::bls::Fr;
+        use blstrs::Scalar as Fr;
         use fr32::fr_into_bytes;
         use generic_array::GenericArray;
         use merkletree::store::DiskStore;
@@ -794,7 +794,7 @@ impl<'a, Tree: 'static + MerkleTreeTrait, G: 'static + Hasher> StackedDrg<'a, Tr
         })
     }
 
-    #[cfg(any(feature = "gpu"))]
+    #[cfg(any(feature = "cuda", feature = "opencl"))]
     fn generate_tree_r_last<TreeArity>(
         data: &mut Data<'_>,
         nodes_count: usize,
@@ -827,7 +827,7 @@ impl<'a, Tree: 'static + MerkleTreeTrait, G: 'static + Hasher> StackedDrg<'a, Tr
         }
     }
 
-    #[cfg(not(any(feature = "gpu")))]
+    #[cfg(not(any(feature = "cuda", feature = "opencl")))]
     fn generate_tree_r_last<TreeArity>(
         data: &mut Data<'_>,
         nodes_count: usize,
@@ -849,7 +849,7 @@ impl<'a, Tree: 'static + MerkleTreeTrait, G: 'static + Hasher> StackedDrg<'a, Tr
         )
     }
 
-    #[cfg(any(feature = "gpu"))]
+    #[cfg(any(feature = "cuda", feature = "opencl"))]
     fn generate_tree_r_last_gpu<TreeArity>(
         data: &mut Data<'_>,
         nodes_count: usize,
@@ -866,7 +866,7 @@ impl<'a, Tree: 'static + MerkleTreeTrait, G: 'static + Hasher> StackedDrg<'a, Tr
         use std::io::Write;
         use std::sync::mpsc::sync_channel as channel;
 
-        use bellperson::bls::Fr;
+        use blstrs::Scalar as Fr;
         use fr32::fr_into_bytes;
         use merkletree::merkle::{get_merkle_tree_cache_size, get_merkle_tree_leafs};
         use neptune::{
@@ -1403,7 +1403,7 @@ impl<'a, Tree: 'static + MerkleTreeTrait, G: 'static + Hasher> StackedDrg<'a, Tr
     // Assumes data is all zeros.
     // Replica path is used to create configs, but is not read.
     // Instead new zeros are provided (hence the need for replica to be all zeros).
-    #[cfg(any(feature = "gpu"))]
+    #[cfg(any(feature = "cuda", feature = "opencl"))]
     fn generate_fake_tree_r_last<TreeArity>(
         nodes_count: usize,
         tree_count: usize,
@@ -1416,7 +1416,7 @@ impl<'a, Tree: 'static + MerkleTreeTrait, G: 'static + Hasher> StackedDrg<'a, Tr
         use std::fs::OpenOptions;
         use std::io::Write;
 
-        use bellperson::bls::Fr;
+        use blstrs::Scalar as Fr;
         use ff::Field;
         use fr32::fr_into_bytes;
         use merkletree::merkle::{get_merkle_tree_cache_size, get_merkle_tree_leafs};
@@ -1535,7 +1535,7 @@ impl<'a, Tree: 'static + MerkleTreeTrait, G: 'static + Hasher> StackedDrg<'a, Tr
     // Assumes data is all zeros.
     // Replica path is used to create configs, but is not read.
     // Instead new zeros are provided (hence the need for replica to be all zeros).
-    #[cfg(not(any(feature = "gpu")))]
+    #[cfg(not(any(feature = "cuda", feature = "opencl")))]
     fn generate_fake_tree_r_last<TreeArity>(
         nodes_count: usize,
         tree_count: usize,
