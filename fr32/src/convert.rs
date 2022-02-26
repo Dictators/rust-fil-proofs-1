@@ -46,6 +46,12 @@ pub fn fr_into_bytes(fr: &Fr) -> Fr32Vec {
     fr.to_repr().to_vec()
 }
 
+/// Takes an Fr and copies exactly 32 bytes guaranteed to contain a valid Fr into the fr_bytes output slice.
+#[inline]
+pub fn fr_into_bytes_slice(fr: &Fr, fr_bytes: &mut [u8]) {
+    fr_bytes.copy_from_slice(&fr.to_repr());
+}
+
 #[inline]
 pub fn u64_into_fr(n: u64) -> Fr {
     Fr::from(n)
@@ -57,7 +63,7 @@ mod tests {
 
     fn bytes_fr_test(bytes: Fr32Ary, expect_success: bool) {
         let b = &bytes[..];
-        let fr_result = bytes_into_fr(&b);
+        let fr_result = bytes_into_fr(b);
         if expect_success {
             let f = fr_result.expect("Failed to convert bytes to `Fr`");
             let b2 = fr_into_bytes(&f);

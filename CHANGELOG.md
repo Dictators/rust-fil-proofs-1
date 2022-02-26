@@ -7,6 +7,44 @@ and this project adheres to [Semantic Versioning](https://book.async.rs/overview
 
 ## Unreleased
 
+## [11.0.2] - 2022-02-09
+
+- Fix cache clearing by resetting the cache path first [#1563](https://github.com/filecoin-project/rust-fil-proofs/pull/1563)
+- Test updates and clean-ups [#1562](https://github.com/filecoin-project/rust-fil-proofs/pull/1562)
+
+## [11.0.1] - 2022-02-03
+
+- NOTE: This release contains the SnapDeals related API and funtionality. The parameters referenced in the parameters.json are now mainnet ready.
+- Update SnapDeal Production Parameters [#1559](https://github.com/filecoin-project/rust-fil-proofs/pull/1559)
+- Add Poseidon version of SnapDeals (concept, not full impl) [#1547](https://github.com/filecoin-project/rust-fil-proofs/pull/1547)
+- Fix empty sector update proof priority and add debugging [#1558](https://github.com/filecoin-project/rust-fil-proofs/pull/1558)
+- Correctly set the cache path for empty sector update proofs [#1557](https://github.com/filecoin-project/rust-fil-proofs/pull/1557)
+- Update project codeowners file [#1555](https://github.com/filecoin-project/rust-fil-proofs/pull/1555)
+- Add releases dir with Cargo.lock files for future releases [#1554](https://github.com/filecoin-project/rust-fil-proofs/pull/1554)
+- Make paramcache arguments mututally exclusive [#1552](https://github.com/filecoin-project/rust-fil-proofs/pull/1552)
+
+## [11.0.0] - 2022-01-10
+
+- NOTE: This release contains the SnapDeals related API and funtionality, however the parameters referenced in the parameters.json are NOT
+mainnet ready and will be replaced in a future version.  This release is intended for testing SnapDeals only.
+- Update paramcache to properly generate .meta files for Empty Sector Update parameters [#1551](https://github.com/filecoin-project/rust-fil-proofs/pull/1551)
+- Add support for Empty Sector Update proofs (SnapDeal) [#1519](https://github.com/filecoin-project/rust-fil-proofs/pull/1519)
+- Expose multicore sdr feature explicitly [#1510](https://github.com/filecoin-project/rust-fil-proofs/pull/1510)
+- Reset multicore sdr consumer [#1535](https://github.com/filecoin-project/rust-fil-proofs/pull/1535)
+- Update heim dep to current master branch [#1539](https://github.com/filecoin-project/rust-fil-proofs/pull/1539)
+
+## [10.1.0] - 2021-10-25
+
+- Allow window post proving on a single partition basis [#1526](https://github.com/filecoin-project/rust-fil-proofs/pull/1526)
+- Update bellperson, neptune, and rust-toolchain [#1529](https://github.com/filecoin-project/rust-fil-proofs/pull/1529)
+- Reduce verbose info logging [#1530](https://github.com/filecoin-project/rust-fil-proofs/pull/1530)
+- Improve benchy by printing help when no command is given [#1527](https://github.com/filecoin-project/rust-fil-proofs/pull/1527)
+- Fall back to CPU if GPU is not available [#1517](https://github.com/filecoin-project/rust-fil-proofs/pull/1517)
+- remove FIL_PROOFS_CUDA_NVCC_ARGS env var [#1520](https://github.com/filecoin-project/rust-fil-proofs/pull/1520)
+- Split GPU Tree builder CI jobs [#1518](https://github.com/filecoin-project/rust-fil-proofs/pull/1518)
+- Use GPU Tree builder only for Poseidon hashes [#1515](https://github.com/filecoin-project/rust-fil-proofs/pull/1515)
+- Run GPU Tree building tests on all CI tests [#1514](https://github.com/filecoin-project/rust-fil-proofs/pull/1514)
+
 ## [10.0.0] - 2021-09-30
 
 - Integrate a variety of zk-SNARK proving related performance improvements. For details see [#220](https://github.com/filecoin-project/bellperson#220)
@@ -278,7 +316,11 @@ and this project adheres to [Semantic Versioning](https://book.async.rs/overview
 
 - Initial stable release
 
-[Unreleased]: https://github.com/filecoin-project/rust-fil-proofs/compare/v10.0.0...HEAD
+[Unreleased]: https://github.com/filecoin-project/rust-fil-proofs/compare/v11.0.2...HEAD
+[11.0.2]: https://github.com/filecoin-project/rust-fil-proofs/tree/releases/v11.0.2
+[11.0.1]: https://github.com/filecoin-project/rust-fil-proofs/tree/releases/v11.0.1
+[11.0.0]: https://github.com/filecoin-project/rust-fil-proofs/tree/releases/v11.0.0
+[10.1.0]: https://github.com/filecoin-project/rust-fil-proofs/tree/releases/v10.1.0
 [10.0.0]: https://github.com/filecoin-project/rust-fil-proofs/tree/releases/v10.0.0
 [9.0.2]: https://github.com/filecoin-project/rust-fil-proofs/tree/releases/v9.0.2
 [9.0.1]: https://github.com/filecoin-project/rust-fil-proofs/tree/releases/v9.0.1

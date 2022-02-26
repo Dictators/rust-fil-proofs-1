@@ -25,10 +25,7 @@ use filecoin_proofs::{
 };
 use log::info;
 use serde::{Deserialize, Serialize};
-use storage_proofs_core::api_version::ApiVersion;
-use storage_proofs_core::merkle::MerkleTreeTrait;
-use storage_proofs_core::sector::SectorId;
-
+use storage_proofs_core::{api_version::ApiVersion, merkle::MerkleTreeTrait, sector::SectorId};
 const SECTOR_ID: u64 = 0;
 
 const PIECE_FILE: &str = "piece-file";
@@ -535,7 +532,7 @@ pub fn run_window_post_bench<Tree: 'static + MerkleTreeTrait>(
         &RANDOMNESS,
         &pub_replica_info,
         PROVER_ID,
-        &proof,
+        proof,
     )
     .unwrap();
     let verify_window_post_measurement = measure(|| {
@@ -544,7 +541,7 @@ pub fn run_window_post_bench<Tree: 'static + MerkleTreeTrait>(
             &RANDOMNESS,
             &pub_replica_info,
             PROVER_ID,
-            &proof,
+            proof,
         )
     })
     .expect("failed to verify window post proof");

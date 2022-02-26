@@ -21,6 +21,7 @@ use storage_proofs_porep::{
     stacked::{generate_replica_id, PersistentAux, StackedDrg, TemporaryAux},
     PoRep,
 };
+pub use storage_proofs_update::constants::TreeRHasher;
 use typenum::Unsigned;
 
 use crate::{
@@ -41,6 +42,7 @@ use crate::{
 mod fake_seal;
 mod post_util;
 mod seal;
+mod update;
 mod util;
 mod window_post;
 mod winning_post;
@@ -48,9 +50,12 @@ mod winning_post;
 pub use fake_seal::*;
 pub use post_util::*;
 pub use seal::*;
+pub use update::*;
 pub use util::*;
 pub use window_post::*;
 pub use winning_post::*;
+
+pub use storage_proofs_update::constants::{hs, partition_count};
 
 /// Unseals the sector at `sealed_path` and returns the bytes for a piece
 /// whose first (unpadded) byte begins at `offset` and ends at `offset` plus
@@ -275,7 +280,7 @@ where
     W: Write,
     Tree: 'static + MerkleTreeTrait,
 {
-    info!("unseal_range_inner:start");
+    trace!("unseal_range_inner:start");
 
     let base_tree_size = get_base_tree_size::<DefaultBinaryTree>(porep_config.sector_size)?;
     let base_tree_leafs = get_base_tree_leafs::<DefaultBinaryTree>(base_tree_size)?;
@@ -310,7 +315,7 @@ where
 
     let amount = UnpaddedBytesAmount(written as u64);
 
-    info!("unseal_range_inner:finish");
+    trace!("unseal_range_inner:finish");
     Ok(amount)
 }
 
@@ -376,7 +381,7 @@ where
     R: Read,
     W: Write,
 {
-    info!("add_piece:start");
+    trace!("add_piece:start");
 
     let result = measure_op(Operation::AddPiece, || {
         ensure_piece_size(piece_size)?;
@@ -384,7 +389,7 @@ where
         let source = BufReader::new(source);
         let mut target = BufWriter::new(target);
 
-        let written_bytes = sum_piece_bytes_with_alignment(&piece_lengths);
+        let written_bytes = sum_piece_bytes_with_alignment(piece_lengths);
         let piece_alignment = get_piece_alignment(written_bytes, piece_size);
         let fr32_reader = Fr32Reader::new(source);
 
@@ -417,7 +422,7 @@ where
         Ok((PieceInfo::new(comm, n)?, written))
     });
 
-    info!("add_piece:finish");
+    trace!("add_piece:finish");
     result
 }
 
@@ -505,18 +510,29 @@ fn verify_store(config: &StoreConfig, arity: usize, required_configs: usize) -> 
 
         let store_len = config.size.expect("disk store size not configured");
         for config in &configs {
+            let data_path = StoreConfig::data_path(&config.path, &config.id);
+            trace!(
+                "verify_store: {:?} has length {} bytes",
+                &data_path,
+                std::fs::metadata(&data_path)?.len()
+            );
             ensure!(
-                DiskStore::<DefaultPieceDomain>::is_consistent(store_len, arity, &config,)?,
+                DiskStore::<DefaultPieceDomain>::is_consistent(store_len, arity, config,)?,
                 "Store is inconsistent: {:?}",
-                StoreConfig::data_path(&config.path, &config.id)
+                &data_path
             );
         }
     } else {
+        trace!(
+            "verify_store: {:?} has length {}",
+            &store_path,
+            std::fs::metadata(&store_path)?.len()
+        );
         ensure!(
             DiskStore::<DefaultPieceDomain>::is_consistent(
                 config.size.expect("disk store size not configured"),
                 arity,
-                &config,
+                config,
             )?,
             "Store is inconsistent: {:?}",
             store_path
@@ -569,22 +585,33 @@ fn verify_level_cache_store<Tree: MerkleTreeTrait>(config: &StoreConfig) -> Resu
 
         let store_len = config.size.expect("disk store size not configured");
         for config in &configs {
+            let data_path = StoreConfig::data_path(&config.path, &config.id);
+            trace!(
+                "verify_store: {:?} has length {}",
+                &data_path,
+                std::fs::metadata(&data_path)?.len()
+            );
             ensure!(
                 LevelCacheStore::<DefaultPieceDomain, File>::is_consistent(
                     store_len,
                     Tree::Arity::to_usize(),
-                    &config,
+                    config,
                 )?,
                 "Store is inconsistent: {:?}",
-                StoreConfig::data_path(&config.path, &config.id)
+                &data_path
             );
         }
     } else {
+        trace!(
+            "verify_store: {:?} has length {}",
+            &store_path,
+            std::fs::metadata(&store_path)?.len()
+        );
         ensure!(
             LevelCacheStore::<DefaultPieceDomain, File>::is_consistent(
                 config.size.expect("disk store size not configured"),
                 Tree::Arity::to_usize(),
-                &config,
+                config,
             )?,
             "Store is inconsistent: {:?}",
             store_path
@@ -648,7 +675,7 @@ where
     R: AsRef<Path>,
     T: AsRef<Path>,
 {
-    info!("validate_cache_for_precommit:start");
+    info!("validate_cache_for_commit:start");
 
     // Verify that the replica exists and is not empty.
     ensure!(
@@ -704,6 +731,7 @@ where
     )?;
     verify_level_cache_store::<DefaultOctTree>(&t_aux.tree_r_last_config)?;
 
-    info!("validate_cache_for_precommit:finish");
+    info!("validate_cache_for_commit:finish");
+
     Ok(())
 }
